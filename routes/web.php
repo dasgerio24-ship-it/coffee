@@ -22,7 +22,21 @@ Route::get('/contacts', function () {
 })->name('contacts');
 
 Route::get('/hello/{name}', function (string $name) {
-    return view('hello', ['name' => $name]);
+    return '<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Приветствие — ' . e(config('app.name')) . '</title>
+</head>
+<body>
+    <nav>
+        <a href="' . route('home') . '">Главная</a> |
+        <a href="' . route('about') . '">О проекте</a> |
+        <a href="' . route('contacts') . '">Контакты</a>
+    </nav>
+    <p>Здравствуйте, ' . e($name) . '! Добро пожаловать в ' . e(config('app.name')) . '.</p>
+</body>
+</html>';
 });
 
 Route::get('/drinks/{id}', function (string $id) {
