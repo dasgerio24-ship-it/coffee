@@ -56,7 +56,7 @@ class CoffeeShopPagesTest extends TestCase
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('<title>Главная — Laravel</title>', false)
+            ->assertSee('<title>Главная — КофеШО</title>', false)
             ->assertSee('class="active">Главная', false)
             ->assertSee('site-footer');
     }
