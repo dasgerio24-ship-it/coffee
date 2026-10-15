@@ -5,11 +5,7 @@
     <title>О проекте — {{ config('app.name') }}</title>
 </head>
 <body>
-    <nav>
-        <a href="{{ route('home') }}">Главная</a> |
-        <a href="{{ route('about') }}">О проекте</a> |
-        <a href="{{ route('contacts') }}">Контакты</a>
-    </nav>
+    @include('partials.navigation')
     <h1>О проекте</h1>
     <p>ФИО: {{ $name }}</p>
     <p>Группа: {{ $group }}</p>

@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -22,23 +23,40 @@ Route::get('/contacts', function () {
 })->name('contacts');
 
 Route::get('/hello/{name}', function (string $name) {
-    return '<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Приветствие — ' . e(config('app.name')) . '</title>
-</head>
-<body>
-    <nav>
-        <a href="' . route('home') . '">Главная</a> |
-        <a href="' . route('about') . '">О проекте</a> |
-        <a href="' . route('contacts') . '">Контакты</a>
-    </nav>
-    <p>Здравствуйте, ' . e($name) . '! Добро пожаловать в ' . e(config('app.name')) . '.</p>
-</body>
-</html>';
-});
+    return view('hello', ['name' => $name]);
+})->name('hello');
+
+Route::get('/drinks', function () {
+    return view('drinks.index', ['items' => config('catalog.items')]);
+})->name('drinks.index');
 
 Route::get('/drinks/{id}', function (string $id) {
-    return view('drink', ['id' => $id]);
+    $drink = config("catalog.items.$id");
+
+    abort_if($drink === null, 404);
+
+    return view('drinks.show', ['id' => $id, 'drink' => $drink]);
 })->whereNumber('id')->name('drinks.show');
+
+Route::view('/rules', 'rules')->name('rules');
+Route::redirect('/main', '/')->name('main');
+
+Route::get('/booking', function () {
+    return view('booking');
+})->middleware('hours:9,18')->name('booking');
+
+Route::prefix('admin')->name('admin.')->middleware('admin.key')->group(function (): void {
+    Route::view('/', 'admin.dashboard')->name('dashboard');
+
+    Route::get('/drinks', function () {
+        return view('admin.drinks.index', ['items' => config('catalog.items')]);
+    })->name('drinks');
+
+    Route::view('/drinks/create', 'admin.drinks.create')->name('drinks.create');
+
+    Route::get('/logout', function (Request $request) {
+        $request->session()->forget('is_admin');
+
+        return redirect()->route('home');
+    })->withoutMiddleware('admin.key')->name('logout');
+});

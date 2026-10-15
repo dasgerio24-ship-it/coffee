@@ -65,7 +65,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Almaty',
 
     /*
     |--------------------------------------------------------------------------
@@ -98,6 +98,8 @@ return [
     'cipher' => 'AES-256-CBC',
 
     'key' => env('APP_KEY'),
+
+    'admin_key' => env('ADMIN_KEY'),
 
     'previous_keys' => [
         ...array_filter(

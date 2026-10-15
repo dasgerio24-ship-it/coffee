@@ -5,11 +5,7 @@
     <title>Контакты — {{ config('app.name') }}</title>
 </head>
 <body>
-    <nav>
-        <a href="{{ route('home') }}">Главная</a> |
-        <a href="{{ route('about') }}">О проекте</a> |
-        <a href="{{ route('contacts') }}">Контакты</a>
-    </nav>
+    @include('partials.navigation')
     <h1>Контакты</h1>
     <p>Адрес: {{ $address }}</p>
     <p>Телефон: {{ $phone }}</p>
