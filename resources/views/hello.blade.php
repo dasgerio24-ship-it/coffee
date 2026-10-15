@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Приветствие — {{ config('app.name') }}</title>
-</head>
-<body>
-    @include('partials.navigation')
-    <p>Здравствуйте, {{ $name }}! Добро пожаловать в {{ config('app.name') }}.</p>
-</body>
-</html>
+@extends('layouts.app')
+
+@section('title', 'Приветствие')
+
+@section('content')
+    <h1>Здравствуйте, {{ $name }}!</h1>
+    <p>Добро пожаловать в {{ config('app.name') }}.</p>
+@endsection

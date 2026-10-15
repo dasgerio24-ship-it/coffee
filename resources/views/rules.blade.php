@@ -1,18 +1,14 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Правила кофейни — {{ config('app.name') }}</title>
-</head>
-<body>
-    @include('partials.navigation')
+@extends('layouts.app')
+
+@section('title', 'Правила кофейни')
+
+@section('content')
     <h1>Правила кофейни</h1>
-    <ol>
+    <ol class="card">
         <li>Уважайте гостей и сотрудников кофейни.</li>
         <li>Заказы принимаются у стойки или на странице заказа с собой.</li>
         <li>Пожалуйста, соблюдайте чистоту в зале.</li>
         <li>Сообщите бариста об аллергии до приготовления напитка.</li>
         <li>Оплачивайте заказ до его получения.</li>
     </ol>
-</body>
-</html>
+@endsection

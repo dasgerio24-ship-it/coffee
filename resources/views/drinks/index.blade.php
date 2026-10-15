@@ -1,16 +1,21 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Каталог напитков — {{ config('app.name') }}</title>
-</head>
-<body>
-    @include('partials.navigation')
+@extends('layouts.app')
+
+@section('title', 'Каталог напитков')
+
+@section('content')
     <h1>Каталог напитков</h1>
-    <ul>
-        @foreach ($items as $id => $drink)
-            <li><a href="{{ route('drinks.show', $id) }}">{{ $drink['title'] }}</a></li>
-        @endforeach
-    </ul>
-</body>
-</html>
+    {{-- Порядковый номер записи задаётся циклом Blade. --}}
+    @forelse ($items as $id => $item)
+        <article class="card">
+            <h2>{{ $loop->iteration }}. <a href="{{ route('drinks.show', $id) }}">{{ $item['title'] }}</a>
+                @if ((int) $item['price'] >= 1500)
+                    <span class="badge">Премиум</span>
+                @endif
+            </h2>
+            <p>{{ $item['volume'] }} · {{ $item['price'] }}</p>
+            <p>{{ $item['description'] }}</p>
+        </article>
+    @empty
+        <p>Каталог пока пуст</p>
+    @endforelse
+@endsection

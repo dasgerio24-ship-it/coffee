@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Доступ запрещён — {{ config('app.name') }}</title>
-</head>
-<body>
-    @include('partials.navigation')
+@extends('layouts.app')
+
+@section('title', 'Доступ запрещён')
+
+@section('content')
     <h1>Доступ запрещён</h1>
     <p>{{ $exception->getMessage() }}</p>
-</body>
-</html>
+@endsection
