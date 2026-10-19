@@ -2,11 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
+
 class PageController extends Controller
 {
     public function home()
     {
-        return view('home');
+        $drinks = DB::table('drinks')
+            ->join('categories', 'drinks.category_id', '=', 'categories.id')
+            ->select('drinks.*', 'categories.name as category')
+            ->orderBy('title')
+            ->limit(3)
+            ->get();
+
+        return view('home', compact('drinks'));
     }
 
     public function about()

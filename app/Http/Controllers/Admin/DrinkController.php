@@ -3,14 +3,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 
 class DrinkController extends Controller
 {
     public function index()
     {
-        $items = config('catalog.items');
+        $drinks = DB::table('drinks')
+            ->join('categories', 'drinks.category_id', '=', 'categories.id')
+            ->select('drinks.*', 'categories.name as category')
+            ->orderBy('title')
+            ->get();
 
-        return view('admin.drinks.index', compact('items'));
+        return view('admin.drinks.index', compact('drinks'));
     }
 
     public function create()

@@ -5,17 +5,17 @@
 @section('content')
     <h1>Каталог напитков</h1>
     {{-- Порядковый номер записи задаётся циклом Blade. --}}
-    @forelse ($items as $id => $item)
-        <article class="card">
-            <h2>{{ $loop->iteration }}. <a href="{{ route('drinks.show', $id) }}">{{ $item['title'] }}</a>
-                @if ((int) $item['price'] >= 1500)
-                    <span class="badge">Премиум</span>
-                @endif
-            </h2>
-            <p>{{ $item['volume'] }} · {{ $item['price'] }}</p>
-            <p>{{ $item['description'] }}</p>
-        </article>
+    @forelse ($drinks as $drink)
+        <x-card
+            :title="$loop->iteration . '. ' . $drink->title"
+            :url="route('drinks.show', $drink->id)"
+            :badge="$drink->price >= 1500 ? 'Премиум' : null"
+        >
+            <p>Категория: {{ $drink->category }}</p>
+            <p>{{ number_format($drink->price, 0, ',', ' ') }} ₸ · {{ $drink->volume }} мл</p>
+            <p>{{ $drink->description }}</p>
+        </x-card>
     @empty
-        <p>Каталог пока пуст</p>
+        <x-alert type="info">Каталог пока пуст</x-alert>
     @endforelse
 @endsection

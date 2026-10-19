@@ -10,23 +10,31 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    @foreach (array_keys(reset($items)) as $field)
-                        <th>{{ ucfirst(str_replace('_', ' ', $field)) }}</th>
-                    @endforeach
+                    <th>Название</th>
+                    <th>Категория</th>
+                    <th>Цена</th>
+                    <th>Объём</th>
+                    <th>Калории</th>
+                    <th>Описание</th>
+                    <th>В наличии</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($items as $id => $item)
+                @foreach ($drinks as $drink)
                     <tr>
-                        <td>{{ $id }}</td>
-                        <td>{{ $item['title'] }}
+                        <td>{{ $drink->id }}</td>
+                        <td>
+                            {{ $drink->title }}
                             @if ($loop->first)
-                                <span class="badge">новая</span>
+                                <x-badge>новая</x-badge>
                             @endif
                         </td>
-                        @foreach (array_slice($item, 1, null, true) as $value)
-                            <td>{{ $value }}</td>
-                        @endforeach
+                        <td>{{ $drink->category }}</td>
+                        <td>{{ number_format($drink->price, 0, ',', ' ') }} ₸</td>
+                        <td>{{ $drink->volume }} мл</td>
+                        <td>{{ $drink->calories ?? '—' }}</td>
+                        <td>{{ $drink->description }}</td>
+                        <td>{{ $drink->in_stock ? 'Да' : 'Нет' }}</td>
                     </tr>
                 @endforeach
             </tbody>

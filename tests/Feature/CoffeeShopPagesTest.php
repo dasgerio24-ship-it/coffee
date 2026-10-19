@@ -2,43 +2,64 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class CoffeeShopPagesTest extends TestCase
 {
-    public function test_catalog_pages_and_not_found_responses(): void
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->seed();
+    }
+
+    public function test_drink_pages_and_not_found_responses(): void
     {
         $this->get('/drinks')
             ->assertOk()
             ->assertSee('Капучино')
+            ->assertSee('Кофе')
             ->assertSee('1. ', false)
             ->assertSee('Премиум')
             ->assertSee('class="active">Каталог', false);
 
         $this->get('/drinks/1')
             ->assertOk()
+            ->assertSee('Капучино')
+            ->assertSee('Кофе')
             ->assertSee('Заказать с собой')
-            ->assertSee('1400 ₸')
+            ->assertSee('1 400 ₸')
             ->assertSee('class="active">Каталог', false);
 
         $this->get('/drinks/999')
             ->assertNotFound()
             ->assertSee('Такой страницы нет')
+            ->assertSee('class="alert alert-error"', false)
             ->assertSee('class="menu"', false)
             ->assertSee('site-footer');
 
         $this->get('/drinks/abc')->assertNotFound();
     }
 
-    public function test_catalog_escapes_html_in_drink_titles(): void
+    public function test_drink_titles_escape_html(): void
     {
-        config([
-            'catalog.items.99' => [
-                'title' => '<b>Тест</b>',
-                'price' => '1000 ₸',
-                'volume' => '50 мл',
-                'description' => 'Проверка экранирования.',
-            ],
+        $categoryId = DB::table('categories')->where('name', 'Кофе')->value('id');
+
+        DB::table('drinks')->insert([
+            'id' => 99,
+            'category_id' => $categoryId,
+            'title' => '<b>Тест</b>',
+            'price' => 1000.00,
+            'volume' => 50,
+            'calories' => null,
+            'description' => 'Проверка экранирования.',
+            'in_stock' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         $this->get('/drinks')
@@ -54,20 +75,23 @@ class CoffeeShopPagesTest extends TestCase
 
     public function test_home_page_uses_the_shared_layout_and_active_navigation(): void
     {
-        $this->get('/')
+        $response = $this->get('/')
             ->assertOk()
             ->assertSee('<title>Главная — КофеШО</title>', false)
             ->assertSee('class="active">Главная', false)
             ->assertSee('site-footer');
+
+        $this->assertSame(3, substr_count($response->getContent(), '<article class="card card-wide">'));
     }
 
-    public function test_empty_catalog_uses_the_blade_empty_branch(): void
+    public function test_empty_drink_list_uses_the_blade_empty_branch(): void
     {
-        config(['catalog.items' => []]);
+        DB::table('drinks')->delete();
 
         $this->get('/drinks')
             ->assertOk()
-            ->assertSee('Каталог пока пуст');
+            ->assertSee('Каталог пока пуст')
+            ->assertSee('class="alert alert-info"', false);
     }
 
     public function test_rules_booking_and_main_redirect(): void

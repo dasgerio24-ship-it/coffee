@@ -4,5 +4,5 @@
 
 @section('content')
     <h1>Доступ запрещён</h1>
-    <p>{{ $exception->getMessage() }}</p>
+    <x-alert type="warning">{{ $exception->getMessage() }}</x-alert>
 @endsection
