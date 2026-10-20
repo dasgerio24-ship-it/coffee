@@ -217,42 +217,9 @@ class CoffeeShopPagesTest extends TestCase
         $this->get('/main')->assertRedirect('/');
     }
 
-    public function test_admin_access_requires_a_key_or_authorized_session(): void
+    public function test_admin_area_redirects_guests_to_login(): void
     {
         $this->get('/admin')
-            ->assertForbidden()
-            ->assertSee('class="menu"', false)
-            ->assertSee('site-footer');
-
-        config(['app.admin_key' => 'test-admin-key']);
-
-        $this->get('/admin?key=test-admin-key')
-            ->assertOk()
-            ->assertSee('Администрирование')
-            ->assertSee('Панель')
-            ->assertSee('Напитки')
-            ->assertSee('Выход');
-
-        $this->get('/admin/drinks')
-            ->assertOk()
-            ->assertSee('Флэт уайт')
-            ->assertSee('новая')
-            ->assertSee('class="active">Напитки', false);
-
-        $this->get('/admin/drinks/create')
-            ->assertOk()
-            ->assertSee('Добавить напиток');
-
-        $this->get('/admin/logout')
-            ->assertRedirect('/');
-
-        $this->get('/admin')->assertForbidden();
-    }
-
-    public function test_admin_key_must_be_configured(): void
-    {
-        config(['app.admin_key' => null]);
-
-        $this->get('/admin?key=anything')->assertForbidden();
+            ->assertRedirect(route('login'));
     }
 }

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\Drink;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Routing\Router;
 use Tests\TestCase;
@@ -17,7 +18,7 @@ class AdminCrudTest extends TestCase
         parent::setUp();
 
         $this->withoutVite();
-        $this->withSession(['is_admin' => true]);
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
     }
 
     public function test_resource_route_names_and_methods_are_registered(): void

@@ -22,15 +22,26 @@ class DatabaseSeeder extends Seeder
             DrinkSeeder::class,
         ]);
 
+        User::factory()->create([
+            'name' => 'Администратор',
+            'email' => 'admin@test.kz',
+            'role' => 'admin',
+        ]);
+
+        User::factory()->create([
+            'name' => 'Редактор',
+            'email' => 'editor@test.kz',
+            'role' => 'editor',
+        ]);
+
+        User::factory()->create([
+            'name' => 'Пользователь',
+            'email' => 'user@test.kz',
+            'role' => 'user',
+        ]);
+
         Drink::factory(40)
             ->recycle(Category::all())
             ->create();
-
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
     }
 }

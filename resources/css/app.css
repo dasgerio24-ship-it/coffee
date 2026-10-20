@@ -303,6 +303,16 @@ h3 {
     box-shadow: 0 0 0 1px #b42318;
 }
 
+.link {
+    padding: 0;
+    border: 0;
+    color: inherit;
+    background: transparent;
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 .error {
     margin-bottom: 0.35rem;
     color: #9b1c1c;

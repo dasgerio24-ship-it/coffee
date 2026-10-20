@@ -11,10 +11,14 @@
         <div class="container">
             <a class="brand" href="{{ route('admin.dashboard') }}">Администрирование</a>
             <nav class="menu admin-menu" aria-label="Меню администратора">
+                <span>{{ auth()->user()->name }} ({{ auth()->user()->role }})</span>
                 <a href="{{ route('admin.dashboard') }}" @class(['active' => request()->routeIs('admin.dashboard')])>Панель</a>
                 <a href="{{ route('admin.drinks.index') }}" @class(['active' => request()->routeIs('admin.drinks.*')])>Напитки</a>
                 <a href="{{ route('admin.categories.index') }}" @class(['active' => request()->routeIs('admin.categories.*')])>Категории</a>
-                <a href="{{ route('admin.logout') }}">Выход</a>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button class="link" type="submit">Выйти</button>
+                </form>
             </nav>
         </div>
     </header>

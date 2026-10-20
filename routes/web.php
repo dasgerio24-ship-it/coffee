@@ -3,7 +3,8 @@
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DrinkController as AdminDrinkController;
-use App\Http\Controllers\Admin\LogoutController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DrinkController;
 use App\Http\Controllers\PageController;
@@ -28,11 +29,19 @@ Route::redirect('/main', '/')->name('main');
 
 Route::get('/booking', [PageController::class, 'booking'])->middleware('hours:9,18')->name('booking');
 
-Route::prefix('admin')->name('admin.')->middleware('admin.key')->group(function (): void {
+Route::middleware('guest')->group(function (): void {
+    Route::get('/register', [RegisterController::class, 'create'])->name('register');
+    Route::post('/register', [RegisterController::class, 'store']);
+
+    Route::get('/login', [LoginController::class, 'create'])->name('login');
+    Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:5,1');
+});
+
+Route::post('/logout', [LoginController::class, 'destroy'])->middleware('auth')->name('logout');
+
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin-panel'])->group(function (): void {
     Route::get('/', DashboardController::class)->name('dashboard');
 
     Route::resource('drinks', AdminDrinkController::class)->except('show');
     Route::resource('categories', AdminCategoryController::class)->except('show');
-
-    Route::get('/logout', LogoutController::class)->withoutMiddleware('admin.key')->name('logout');
 });

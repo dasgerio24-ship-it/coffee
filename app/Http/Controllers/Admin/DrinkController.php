@@ -8,13 +8,14 @@ use App\Http\Requests\UpdateDrinkRequest;
 use App\Models\Category;
 use App\Models\Drink;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class DrinkController extends Controller
 {
     public function index(): View
     {
-        $drinks = Drink::with('category')
+        $drinks = Drink::with(['category', 'user'])
             ->latest()
             ->paginate(15);
 
@@ -23,6 +24,8 @@ class DrinkController extends Controller
 
     public function create(): View
     {
+        Gate::authorize('create', Drink::class);
+
         $categories = Category::orderBy('name')->get();
 
         return view('admin.drinks.create', compact('categories'));
@@ -30,7 +33,7 @@ class DrinkController extends Controller
 
     public function store(StoreDrinkRequest $request): RedirectResponse
     {
-        Drink::create($request->validated());
+        Drink::create($request->validated() + ['user_id' => $request->user()->id]);
 
         return redirect()
             ->route('admin.drinks.index')
@@ -39,6 +42,8 @@ class DrinkController extends Controller
 
     public function edit(Drink $drink): View
     {
+        Gate::authorize('update', $drink);
+
         $categories = Category::orderBy('name')->get();
 
         return view('admin.drinks.edit', compact('drink', 'categories'));
@@ -55,6 +60,8 @@ class DrinkController extends Controller
 
     public function destroy(Drink $drink): RedirectResponse
     {
+        Gate::authorize('delete', $drink);
+
         $drink->delete();
 
         return back()->with('success', 'Напиток удалён');

@@ -15,6 +15,7 @@ class Drink extends Model
 
     protected $fillable = [
         'category_id',
+        'user_id',
         'title',
         'price',
         'volume',
@@ -36,6 +37,11 @@ class Drink extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function scopeInStock(Builder $query): void

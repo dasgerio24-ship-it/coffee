@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Middleware\CheckAdminKey;
 use App\Http\Middleware\LogVisit;
 use App\Http\Middleware\WorkingHours;
 use Illuminate\Foundation\Application;
@@ -17,7 +16,6 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [LogVisit::class]);
         $middleware->alias([
-            'admin.key' => CheckAdminKey::class,
             'hours' => WorkingHours::class,
         ]);
     })
