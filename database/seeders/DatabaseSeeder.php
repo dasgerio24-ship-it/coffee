@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
+use App\Models\Drink;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -19,6 +21,10 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             DrinkSeeder::class,
         ]);
+
+        Drink::factory(40)
+            ->recycle(Category::all())
+            ->create();
 
         // User::factory(10)->create();
 

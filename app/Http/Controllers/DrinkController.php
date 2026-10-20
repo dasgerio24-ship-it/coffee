@@ -2,31 +2,51 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\DB;
+use App\Models\Category;
+use App\Models\Drink;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
 class DrinkController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $drinks = DB::table('drinks')
-            ->join('categories', 'drinks.category_id', '=', 'categories.id')
-            ->select('drinks.*', 'categories.name as category')
-            ->orderBy('title')
-            ->get();
+        $requestedSort = $request->query('sort');
+        $sort = is_string($requestedSort) && in_array($requestedSort, ['title', 'price', 'volume', 'newest'], true)
+            ? $requestedSort
+            : 'title';
 
-        return view('drinks.index', compact('drinks'));
+        $requestedTerm = $request->query('q');
+        $term = is_string($requestedTerm) ? $requestedTerm : null;
+        $requestedCategory = $request->query('category');
+        $categoryId = is_string($requestedCategory) ? $requestedCategory : null;
+
+        $query = Drink::with('category')
+            ->search($term)
+            ->when(filled($categoryId), function (Builder $query) use ($categoryId): void {
+                $query->where('category_id', $categoryId);
+            });
+
+        if ($sort === 'newest') {
+            $query->latest();
+        } else {
+            $query->orderBy($sort);
+        }
+
+        $drinks = $query->paginate(9)->withQueryString();
+        $categories = Category::withCount('drinks')->orderBy('name')->get();
+
+        return view('drinks.index', compact('drinks', 'categories', 'sort', 'term'));
     }
 
-    public function show(int $id)
+    public function show(Drink $drink)
     {
-        $drink = DB::table('drinks')
-            ->join('categories', 'drinks.category_id', '=', 'categories.id')
-            ->select('drinks.*', 'categories.name as category')
-            ->where('drinks.id', $id)
-            ->first();
+        $drink->load('category');
+        $relatedDrinks = $drink->category->drinks()
+            ->where('id', '!=', $drink->id)
+            ->take(3)
+            ->get();
 
-        abort_if(! $drink, 404);
-
-        return view('drinks.show', compact('drink'));
+        return view('drinks.show', compact('drink', 'relatedDrinks'));
     }
 }

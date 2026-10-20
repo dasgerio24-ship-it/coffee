@@ -29,7 +29,7 @@
                                 <x-badge>новая</x-badge>
                             @endif
                         </td>
-                        <td>{{ $drink->category }}</td>
+                        <td>{{ $drink->category->name }}</td>
                         <td>{{ number_format($drink->price, 0, ',', ' ') }} ₸</td>
                         <td>{{ $drink->volume }} мл</td>
                         <td>{{ $drink->calories ?? '—' }}</td>

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DrinkController as AdminDrinkController;
 use App\Http\Controllers\Admin\LogoutController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DrinkController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
@@ -16,7 +17,10 @@ Route::get('/contacts', [PageController::class, 'contacts'])->name('contacts');
 Route::get('/hello/{name}', [PageController::class, 'hello'])->name('hello');
 
 Route::get('/drinks', [DrinkController::class, 'index'])->name('drinks.index');
-Route::get('/drinks/{id}', [DrinkController::class, 'show'])->whereNumber('id')->name('drinks.show');
+Route::get('/drinks/{drink}', [DrinkController::class, 'show'])->whereNumber('drink')->name('drinks.show');
+Route::get('/categories/{category}', [CategoryController::class, 'show'])
+    ->whereNumber('category')
+    ->name('categories.show');
 
 Route::get('/rules', [PageController::class, 'rules'])->name('rules');
 Route::redirect('/main', '/')->name('main');

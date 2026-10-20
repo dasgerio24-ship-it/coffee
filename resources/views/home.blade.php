@@ -14,7 +14,7 @@
                 :badge="$drink->price >= 1500 ? 'Премиум' : null"
                 class="card-wide"
             >
-                <p>Категория: {{ $drink->category }}</p>
+                <p>Категория: <a href="{{ route('categories.show', $drink->category) }}">{{ $drink->category->name }}</a></p>
                 <p>{{ number_format($drink->price, 0, ',', ' ') }} ₸ · {{ $drink->volume }} мл</p>
                 <p>{{ $drink->description }}</p>
             </x-card>
