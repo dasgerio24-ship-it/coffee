@@ -4,7 +4,7 @@
 
 @section('content')
     <h1>Напитки</h1>
-    <p><a href="{{ route('admin.drinks.create') }}">Добавить напиток</a></p>
+    <p><a class="button" href="{{ route('admin.drinks.create') }}">Добавить напиток</a></p>
     <div class="table-scroll">
         <table>
             <thead>
@@ -14,9 +14,9 @@
                     <th>Категория</th>
                     <th>Цена</th>
                     <th>Объём</th>
-                    <th>Калории</th>
-                    <th>Описание</th>
                     <th>В наличии</th>
+                    <th>Создан</th>
+                    <th>Действия</th>
                 </tr>
             </thead>
             <tbody>
@@ -25,20 +25,28 @@
                         <td>{{ $drink->id }}</td>
                         <td>
                             {{ $drink->title }}
-                            @if ($loop->first)
+                            @if ($loop->first && $drinks->onFirstPage())
                                 <x-badge>новая</x-badge>
                             @endif
                         </td>
                         <td>{{ $drink->category->name }}</td>
                         <td>{{ number_format($drink->price, 0, ',', ' ') }} ₸</td>
                         <td>{{ $drink->volume }} мл</td>
-                        <td>{{ $drink->calories ?? '—' }}</td>
-                        <td>{{ $drink->description }}</td>
                         <td>{{ $drink->in_stock ? 'Да' : 'Нет' }}</td>
+                        <td>{{ $drink->created_at->format('d.m.Y') }}</td>
+                        <td class="actions">
+                            <a href="{{ route('admin.drinks.edit', $drink) }}">Изменить</a>
+                            <form method="POST" action="{{ route('admin.drinks.destroy', $drink) }}" onsubmit="return confirm('Удалить запись?')">
+                                @csrf
+                                @method('DELETE')
+                                <button class="danger" type="submit">Удалить</button>
+                            </form>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
     </div>
+    {{ $drinks->links() }}
     <p><a href="{{ route('admin.dashboard') }}">Назад в панель</a></p>
 @endsection

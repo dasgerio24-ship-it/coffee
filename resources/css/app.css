@@ -224,6 +224,90 @@ h3 {
     cursor: pointer;
 }
 
+.admin-form {
+    display: grid;
+    gap: 0.45rem;
+    max-width: 640px;
+}
+
+.admin-form label {
+    margin-top: 0.55rem;
+    font-weight: 700;
+}
+
+.admin-form input,
+.admin-form select,
+.admin-form textarea,
+.admin-form button,
+.button {
+    min-height: 2.5rem;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid #d9c5b0;
+    border-radius: 0.35rem;
+    color: inherit;
+    background: #fffdf9;
+    font: inherit;
+}
+
+.admin-form textarea {
+    min-height: 6rem;
+    resize: vertical;
+}
+
+.admin-form button,
+.button {
+    display: inline-block;
+    width: fit-content;
+    color: #fffaf4;
+    border-color: #765039;
+    background: #765039;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.admin-form .checkbox-label {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.admin-form .checkbox-label input {
+    min-height: auto;
+}
+
+.form-actions,
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    align-items: center;
+    margin-top: 0.75rem;
+}
+
+.actions form {
+    margin: 0;
+}
+
+.danger {
+    padding: 0.35rem 0.6rem;
+    border: 1px solid #9b3434;
+    border-radius: 0.35rem;
+    color: #fff;
+    background: #9b3434;
+    font: inherit;
+    cursor: pointer;
+}
+
+.admin-form .invalid {
+    border-color: #b42318;
+    box-shadow: 0 0 0 1px #b42318;
+}
+
+.error {
+    margin-bottom: 0.35rem;
+    color: #9b1c1c;
+}
+
 .pagination {
     display: flex;
     flex-wrap: wrap;

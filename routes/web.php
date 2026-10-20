@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DrinkController as AdminDrinkController;
 use App\Http\Controllers\Admin\LogoutController;
@@ -30,9 +31,8 @@ Route::get('/booking', [PageController::class, 'booking'])->middleware('hours:9,
 Route::prefix('admin')->name('admin.')->middleware('admin.key')->group(function (): void {
     Route::get('/', DashboardController::class)->name('dashboard');
 
-    Route::get('/drinks', [AdminDrinkController::class, 'index'])->name('drinks');
-
-    Route::get('/drinks/create', [AdminDrinkController::class, 'create'])->name('drinks.create');
+    Route::resource('drinks', AdminDrinkController::class)->except('show');
+    Route::resource('categories', AdminCategoryController::class)->except('show');
 
     Route::get('/logout', LogoutController::class)->withoutMiddleware('admin.key')->name('logout');
 });

@@ -12,12 +12,19 @@
             <a class="brand" href="{{ route('admin.dashboard') }}">Администрирование</a>
             <nav class="menu admin-menu" aria-label="Меню администратора">
                 <a href="{{ route('admin.dashboard') }}" @class(['active' => request()->routeIs('admin.dashboard')])>Панель</a>
-                <a href="{{ route('admin.drinks') }}" @class(['active' => request()->routeIs('admin.drinks', 'admin.drinks.create')])>Напитки</a>
+                <a href="{{ route('admin.drinks.index') }}" @class(['active' => request()->routeIs('admin.drinks.*')])>Напитки</a>
+                <a href="{{ route('admin.categories.index') }}" @class(['active' => request()->routeIs('admin.categories.*')])>Категории</a>
                 <a href="{{ route('admin.logout') }}">Выход</a>
             </nav>
         </div>
     </header>
     <main class="container">
+        @if (session('success'))
+            <x-alert type="success">{{ session('success') }}</x-alert>
+        @endif
+        @if (session('error'))
+            <x-alert type="error">{{ session('error') }}</x-alert>
+        @endif
         @yield('content')
     </main>
     @include('partials.footer')

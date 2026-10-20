@@ -41,7 +41,7 @@ class DrinkFactory extends Factory
             ]),
             'price' => fake()->randomFloat(2, 500, 2500),
             'volume' => fake()->randomElement([200, 250, 300, 350, 400, 500]),
-            'description' => fake()->realText(150),
+            'description' => fake()->sentence(),
             'in_stock' => fake()->boolean(80),
             'calories' => fake()->optional(0.8)->numberBetween(5, 450),
         ];
