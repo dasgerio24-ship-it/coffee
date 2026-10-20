@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class Drink extends Model
 {
@@ -22,6 +23,8 @@ class Drink extends Model
         'description',
         'in_stock',
         'calories',
+        'image',
+        'attachment',
     ];
 
     protected function casts(): array
@@ -32,6 +35,15 @@ class Drink extends Model
             'calories' => 'integer',
             'in_stock' => 'boolean',
         ];
+    }
+
+    public function getImageUrlAttribute(): string
+    {
+        if ($this->image && Storage::disk('public')->exists($this->image)) {
+            return Storage::disk('public')->url($this->image);
+        }
+
+        return asset('images/no-drink.png');
     }
 
     public function category(): BelongsTo

@@ -28,12 +28,12 @@ class CoffeeShopPagesTest extends TestCase
             ->assertOk()
             ->assertSee('Кофе')
             ->assertSee('Кофе ('.$coffee->drinks()->count().')')
-            ->assertSee('1. ', false)
             ->assertSee('Премиум')
+            ->assertSee('alt="Американо"', false)
             ->assertSee('name="q"', false)
             ->assertSee('name="category"', false)
             ->assertSee('name="sort"', false)
-            ->assertSee('Запросов к БД:')
+            ->assertDontSee('Запросов к БД:')
             ->assertSee('class="active">Каталог', false);
 
         $this->get('/drinks/1')

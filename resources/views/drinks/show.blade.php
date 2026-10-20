@@ -3,6 +3,7 @@
 @section('title', $drink->title)
 
 @section('content')
+    <img class="drink-detail-image" src="{{ $drink->image_url }}" alt="{{ $drink->title }}">
     <x-card
         :title="$drink->title"
         :badge="$drink->price >= 1500 ? 'Премиум' : null"
@@ -24,6 +25,15 @@
             <dd>{{ $drink->in_stock ? 'В наличии' : 'Нет в наличии' }}</dd>
         </dl>
         <a href="{{ route('drinks.index') }}">Назад к списку</a>
+        @auth
+            @if ($drink->attachment)
+                <a class="button" href="{{ route('drinks.attachment', $drink) }}">Скачать документ</a>
+            @endif
+        @endauth
+        <p class="drink-qr">
+            <img src="{{ $qrImage }}" alt="QR-код напитка">
+            <span>Откройте страницу напитка по QR-коду</span>
+        </p>
     </x-card>
 
     @if ($relatedDrinks->isNotEmpty())
@@ -34,6 +44,7 @@
                     :title="$relatedDrink->title"
                     :url="route('drinks.show', $relatedDrink)"
                     :badge="$relatedDrink->price >= 1500 ? 'Премиум' : null"
+                    :image="$relatedDrink->image_url"
                 >
                     <p>{{ number_format($relatedDrink->price, 0, ',', ' ') }} ₸ · {{ $relatedDrink->volume }} мл</p>
                 </x-card>

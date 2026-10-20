@@ -48,12 +48,14 @@
                 <button type="submit">Найти</button>
                 <a href="{{ route('drinks.index') }}">Сбросить</a>
             </form>
+            <p><a class="button" href="{{ route('drinks.pdf', request()->query()) }}">Скачать PDF</a></p>
 
             @forelse ($drinks as $drink)
                 <x-card
-                    :title="$drinks->firstItem() + $loop->index . '. ' . $drink->title"
+                    :title="$drink->title"
                     :url="route('drinks.show', $drink)"
                     :badge="$drink->price >= 1500 ? 'Премиум' : null"
+                    :image="$drink->image_url"
                 >
                     <p>Категория: <a href="{{ route('categories.show', $drink->category) }}">{{ $drink->category->name }}</a></p>
                     <p>{{ number_format($drink->price, 0, ',', ' ') }} ₸ · {{ $drink->volume }} мл</p>

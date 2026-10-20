@@ -19,6 +19,11 @@ Route::get('/contacts', [PageController::class, 'contacts'])->name('contacts');
 Route::get('/hello/{name}', [PageController::class, 'hello'])->name('hello');
 
 Route::get('/drinks', [DrinkController::class, 'index'])->name('drinks.index');
+Route::get('/drinks/pdf', [DrinkController::class, 'pdf'])->name('drinks.pdf');
+Route::get('/drinks/{drink}/attachment', [DrinkController::class, 'attachment'])
+    ->whereNumber('drink')
+    ->middleware('auth')
+    ->name('drinks.attachment');
 Route::get('/drinks/{drink}', [DrinkController::class, 'show'])->whereNumber('drink')->name('drinks.show');
 Route::get('/categories/{category}', [CategoryController::class, 'show'])
     ->whereNumber('category')

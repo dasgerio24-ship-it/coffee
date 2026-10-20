@@ -9,7 +9,9 @@ use App\Models\Category;
 use App\Models\Drink;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use RuntimeException;
 
 class DrinkController extends Controller
 {
@@ -33,7 +35,25 @@ class DrinkController extends Controller
 
     public function store(StoreDrinkRequest $request): RedirectResponse
     {
-        Drink::create($request->validated() + ['user_id' => $request->user()->id]);
+        $data = $request->safe()->except(['image', 'attachment', 'remove_image']);
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image')->store('drinks', 'public');
+            if (! is_string($image)) {
+                throw new RuntimeException('Не удалось сохранить изображение напитка.');
+            }
+            $data['image'] = $image;
+        }
+
+        if ($request->hasFile('attachment')) {
+            $attachment = $request->file('attachment')->store('attachments');
+            if (! is_string($attachment)) {
+                throw new RuntimeException('Не удалось сохранить документ напитка.');
+            }
+            $data['attachment'] = $attachment;
+        }
+
+        Drink::create($data + ['user_id' => $request->user()->id]);
 
         return redirect()
             ->route('admin.drinks.index')
@@ -51,7 +71,36 @@ class DrinkController extends Controller
 
     public function update(UpdateDrinkRequest $request, Drink $drink): RedirectResponse
     {
-        $drink->update($request->validated());
+        $data = $request->safe()->except(['image', 'attachment', 'remove_image']);
+        $oldImage = $drink->image;
+        $oldAttachment = $drink->attachment;
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image')->store('drinks', 'public');
+            if (! is_string($image)) {
+                throw new RuntimeException('Не удалось сохранить изображение напитка.');
+            }
+            $data['image'] = $image;
+        } elseif ($request->boolean('remove_image')) {
+            $data['image'] = null;
+        }
+
+        if ($request->hasFile('attachment')) {
+            $attachment = $request->file('attachment')->store('attachments');
+            if (! is_string($attachment)) {
+                throw new RuntimeException('Не удалось сохранить документ напитка.');
+            }
+            $data['attachment'] = $attachment;
+        }
+
+        $drink->update($data);
+
+        if ($oldImage && $oldImage !== $drink->image) {
+            Storage::disk('public')->delete($oldImage);
+        }
+        if ($oldAttachment && $oldAttachment !== $drink->attachment) {
+            Storage::disk('local')->delete($oldAttachment);
+        }
 
         return redirect()
             ->route('admin.drinks.index')
@@ -62,6 +111,12 @@ class DrinkController extends Controller
     {
         Gate::authorize('delete', $drink);
 
+        if ($drink->image) {
+            Storage::disk('public')->delete($drink->image);
+        }
+        if ($drink->attachment) {
+            Storage::disk('local')->delete($drink->attachment);
+        }
         $drink->delete();
 
         return back()->with('success', 'Напиток удалён');

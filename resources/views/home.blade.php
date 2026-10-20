@@ -12,6 +12,7 @@
                 :title="$drink->title"
                 :url="route('drinks.show', $drink->id)"
                 :badge="$drink->price >= 1500 ? 'Премиум' : null"
+                :image="$drink->image_url"
                 class="card-wide"
             >
                 <p>Категория: <a href="{{ route('categories.show', $drink->category) }}">{{ $drink->category->name }}</a></p>

@@ -29,6 +29,9 @@ class UpdateDrinkRequest extends FormRequest
             'description' => ['nullable', 'string', 'max:1000'],
             'calories' => ['nullable', 'integer', 'between:0,2000'],
             'in_stock' => ['boolean'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'attachment' => ['nullable', 'mimes:pdf', 'max:5120'],
+            'remove_image' => ['nullable', 'boolean'],
         ];
     }
 
@@ -52,6 +55,9 @@ class UpdateDrinkRequest extends FormRequest
             'regex' => 'Поле «:attribute» содержит недопустимые символы.',
             'between' => 'Поле «:attribute» должно быть от :min до :max.',
             'boolean' => 'Поле «:attribute» должно иметь значение да или нет.',
+            'image' => 'Файл должен быть изображением.',
+            'mimes' => 'Недопустимый формат файла.',
+            'max' => 'Размер файла не должен превышать :max КБ.',
         ];
     }
 
@@ -65,6 +71,9 @@ class UpdateDrinkRequest extends FormRequest
             'description' => 'Описание',
             'calories' => 'Калорийность',
             'in_stock' => 'В наличии',
+            'image' => 'Изображение',
+            'attachment' => 'Документ',
+            'remove_image' => 'Удалить изображение',
         ];
     }
 }

@@ -14,6 +14,7 @@
                     <th>ID</th>
                     <th>Название</th>
                     <th>Категория</th>
+                    <th>Фото</th>
                     <th>Автор записи</th>
                     <th>Цена</th>
                     <th>Объём</th>
@@ -33,6 +34,7 @@
                             @endif
                         </td>
                         <td>{{ $drink->category->name }}</td>
+                        <td><img src="{{ $drink->image_url }}" alt="{{ $drink->title }}" width="60" height="60" style="object-fit: cover"></td>
                         <td>{{ $drink->user?->name ?? '—' }}</td>
                         <td>{{ number_format($drink->price, 0, ',', ' ') }} ₸</td>
                         <td>{{ $drink->volume }} мл</td>

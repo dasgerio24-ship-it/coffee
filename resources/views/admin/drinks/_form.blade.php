@@ -2,7 +2,7 @@
     <x-alert type="error">Исправьте ошибки в форме ({{ $errors->count() }})</x-alert>
 @endif
 
-<form method="POST" action="{{ $action }}" class="admin-form">
+<form method="POST" action="{{ $action }}" class="admin-form" enctype="multipart/form-data">
     @csrf
     @isset($drink)
         @method('PUT')
@@ -45,6 +45,26 @@
         В наличии
     </label>
     @error('in_stock') <div class="error">{{ $message }}</div> @enderror
+
+    @isset($drink)
+        <label for="image">Изображение напитка</label>
+        <img src="{{ $drink->image_url }}" alt="{{ $drink->title }}" width="180">
+        <label class="checkbox-label" for="remove_image">
+            <input type="checkbox" name="remove_image" id="remove_image" value="1">
+            Удалить текущее изображение
+        </label>
+    @else
+        <label for="image">Изображение напитка</label>
+    @endisset
+    <input id="image" name="image" type="file" accept="image/*">
+    @error('image') <div class="error">{{ $message }}</div> @enderror
+
+    <label for="attachment">Технологическая карта (PDF)</label>
+    <input id="attachment" name="attachment" type="file" accept="application/pdf">
+    @if (! empty($drink?->attachment))
+        <p>Документ прикреплён.</p>
+    @endif
+    @error('attachment') <div class="error">{{ $message }}</div> @enderror
 
     <div class="form-actions">
         <button type="submit">Сохранить</button>
