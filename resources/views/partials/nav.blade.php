@@ -11,6 +11,7 @@
     @endguest
     @auth
         <span>{{ auth()->user()->name }}</span>
+        <a href="{{ route('profile') }}" @class(['active' => request()->routeIs('profile')])>Мои заказы</a>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button class="link" type="submit">Выйти</button>

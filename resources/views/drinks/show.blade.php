@@ -29,7 +29,40 @@
             @if ($drink->attachment)
                 <a class="button" href="{{ route('drinks.attachment', $drink) }}">Скачать документ</a>
             @endif
+            <section class="booking-form">
+                <h2>Заказать с собой</h2>
+                @error('drink')
+                    <div class="error" role="alert">{{ $message }}</div>
+                @enderror
+                <form method="POST" action="{{ route('drinks.bookings.store', $drink) }}">
+                    @csrf
+                    <label for="booking-phone">Телефон</label>
+                    <input
+                        id="booking-phone"
+                        name="phone"
+                        type="tel"
+                        placeholder="+7XXXXXXXXXX"
+                        value="{{ old('phone') }}"
+                        @class(['invalid' => $errors->has('phone')])
+                    >
+                    @error('phone') <div class="error">{{ $message }}</div> @enderror
+
+                    <label for="booking-comment">Комментарий</label>
+                    <textarea
+                        id="booking-comment"
+                        name="comment"
+                        maxlength="300"
+                        @class(['invalid' => $errors->has('comment')])
+                    >{{ old('comment') }}</textarea>
+                    @error('comment') <div class="error">{{ $message }}</div> @enderror
+
+                    <button type="submit">Заказать с собой</button>
+                </form>
+            </section>
         @endauth
+        @guest
+            <p>Войдите, чтобы оставить заказ: <a href="{{ route('login') }}">Войти</a></p>
+        @endguest
         <p class="drink-qr">
             <img src="{{ $qrImage }}" alt="QR-код напитка">
             <span>Откройте страницу напитка по QR-коду</span>

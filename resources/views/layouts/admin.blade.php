@@ -15,6 +15,12 @@
                 <a href="{{ route('admin.dashboard') }}" @class(['active' => request()->routeIs('admin.dashboard')])>Панель</a>
                 <a href="{{ route('admin.drinks.index') }}" @class(['active' => request()->routeIs('admin.drinks.*')])>Напитки</a>
                 <a href="{{ route('admin.categories.index') }}" @class(['active' => request()->routeIs('admin.categories.*')])>Категории</a>
+                @can('manage-bookings')
+                    <a href="{{ route('admin.bookings.index') }}" @class(['active' => request()->routeIs('admin.bookings.*')])>Заказы</a>
+                @endcan
+                <a href="{{ route('admin.notifications') }}" @class(['active' => request()->routeIs('admin.notifications*')])>
+                    🔔 {{ auth()->user()->unreadNotifications()->count() }}
+                </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button class="link" type="submit">Выйти</button>

@@ -325,6 +325,34 @@ h3 {
 
 .admin-form .invalid {
     border-color: #b42318;
+    color: #b42318;
+}
+
+.booking-form {
+    margin-top: 1.5rem;
+}
+
+.booking-form label {
+    display: block;
+    margin-top: 0.75rem;
+}
+
+.booking-form input,
+.booking-form textarea {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 32rem;
+    padding: 0.65rem;
+}
+
+.booking-form textarea {
+    min-height: 6rem;
+}
+
+.notification.unread {
+    border-left: 4px solid #8b5e3c;
+    font-weight: 600;
+    padding: 0.75rem 1rem;
     box-shadow: 0 0 0 1px #b42318;
 }
 
