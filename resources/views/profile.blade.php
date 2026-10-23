@@ -40,6 +40,9 @@
     @forelse ($notifications as $notification)
         <article class="notification unread">
             <p>{{ $notification->data['text'] ?? 'У вас новое уведомление.' }}</p>
+            @if (isset($notification->data['url']))
+                <a href="{{ $notification->data['url'] }}">Скачать PDF-каталог</a>
+            @endif
             <time datetime="{{ $notification->created_at->toIso8601String() }}">
                 {{ $notification->created_at->diffForHumans() }}
             </time>

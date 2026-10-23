@@ -3,11 +3,13 @@
 namespace Tests\Feature;
 
 use App\Contracts\SmsSender;
+use App\Jobs\RemindAboutBooking;
 use App\Mail\BookingReceived;
 use App\Models\Booking;
 use App\Models\Category;
 use App\Models\Drink;
 use App\Models\User;
+use App\Notifications\BookingReminder;
 use App\Notifications\BookingStatusChanged;
 use App\Notifications\NewBooking;
 use App\Services\BookingService;
@@ -16,7 +18,9 @@ use App\Services\Sms\NullSmsSender;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Validation\ValidationException;
+use Mockery;
 use Tests\TestCase;
 
 class BookingBusinessRulesTest extends TestCase
@@ -116,6 +120,13 @@ class BookingBusinessRulesTest extends TestCase
 
         Mail::fake();
         Notification::fake();
+        $smsSender = Mockery::mock(SmsSender::class);
+        $smsSender->shouldReceive('send')
+            ->once()
+            ->with('+77011234567', Mockery::on(
+                fn (string $message): bool => str_contains($message, $drink->title),
+            ));
+        $this->app->instance(SmsSender::class, $smsSender);
 
         $this->actingAs($user)
             ->post(route('drinks.bookings.store', $drink), [
@@ -138,6 +149,58 @@ class BookingBusinessRulesTest extends TestCase
         });
 
         Notification::assertSentTo($admin, NewBooking::class);
+        Notification::assertSentTo($admin, BookingReminder::class);
+        Notification::assertNotSentTo($user, BookingReminder::class);
+    }
+
+    public function test_booking_service_schedules_a_reminder_for_two_minutes_later(): void
+    {
+        Queue::fake();
+        $frozenAt = now();
+        $this->travelTo($frozenAt);
+        $scheduledAt = $frozenAt->copy()->addMinutes(2);
+        $user = User::factory()->create(['role' => 'user']);
+        $drink = Drink::factory()->create(['in_stock' => true]);
+
+        $booking = app(BookingService::class)->create($user, $drink, [
+            'phone' => '+77011234567',
+        ]);
+
+        Queue::assertPushed(
+            RemindAboutBooking::class,
+            fn (RemindAboutBooking $job): bool => $job->booking->is($booking)
+                && $job->delay->equalTo($scheduledAt),
+        );
+    }
+
+    public function test_reminder_notifies_only_a_new_booking(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create(['role' => 'user']);
+        $admin = User::factory()->create(['role' => 'admin']);
+        $drink = Drink::factory()->create(['in_stock' => true]);
+        $newBooking = Booking::create([
+            'user_id' => $user->id,
+            'drink_id' => $drink->id,
+            'phone' => '+77011234567',
+            'status' => 'new',
+        ]);
+        $processedBooking = Booking::create([
+            'user_id' => $user->id,
+            'drink_id' => $drink->id,
+            'phone' => '+77011234568',
+            'status' => 'processed',
+        ]);
+
+        (new RemindAboutBooking($newBooking))->handle();
+        (new RemindAboutBooking($processedBooking))->handle();
+
+        Notification::assertSentToTimes($admin, BookingReminder::class, 1);
+        Notification::assertSentTo(
+            $admin,
+            BookingReminder::class,
+            fn (BookingReminder $notification): bool => $notification->booking->id === $newBooking->id,
+        );
     }
 
     public function test_admin_status_change_updates_booking_and_notifies_its_user(): void

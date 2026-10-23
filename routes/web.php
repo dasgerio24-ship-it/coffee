@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DrinkController as AdminDrinkController;
+use App\Http\Controllers\Admin\ExportController as AdminExportController;
 use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -58,6 +59,10 @@ Route::post('/profile/notifications/read', [ProfileController::class, 'markNotif
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin-panel'])->group(function (): void {
     Route::get('/', DashboardController::class)->name('dashboard');
+    Route::post('/exports/catalog', [AdminExportController::class, 'catalog'])->name('exports.catalog');
+    Route::get('/exports/{file}', [AdminExportController::class, 'download'])
+        ->where('file', '[A-Za-z0-9._-]+\\.pdf')
+        ->name('exports.download');
 
     Route::get('/notifications', [AdminNotificationController::class, 'index'])->name('notifications');
     Route::post('/notifications/read', [AdminNotificationController::class, 'markAllRead'])->name('notifications.read');

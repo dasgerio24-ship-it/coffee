@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\BookingCreated;
 use App\Http\Requests\StoreBookingRequest;
-use App\Mail\BookingReceived;
 use App\Models\Drink;
 use App\Models\User;
-use App\Notifications\NewBooking;
 use App\Services\BookingService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Notification;
 
 class BookingController extends Controller
 {
@@ -24,12 +21,7 @@ class BookingController extends Controller
         abort_unless($user instanceof User, 401);
 
         $booking = $service->create($user, $drink, $request->validated());
-        $booking->load(['user', 'drink']);
-        Mail::to($user)->send(new BookingReceived($booking));
-        Notification::send(
-            User::query()->where('role', 'admin')->get(),
-            new NewBooking($booking),
-        );
+        BookingCreated::dispatch($booking);
 
         return back()->with('success', "Заказ №{$booking->id} отправлен");
     }

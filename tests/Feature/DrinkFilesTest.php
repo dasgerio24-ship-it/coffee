@@ -7,6 +7,7 @@ use App\Models\Drink;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -105,6 +106,30 @@ class DrinkFilesTest extends TestCase
         $this->assertSame(asset('images/no-drink.png'), $drink->image_url);
     }
 
+    public function test_observer_logs_a_created_drink(): void
+    {
+        Log::spy();
+
+        $drink = Drink::factory()->create(['title' => 'lr10-test created log']);
+
+        Log::shouldHaveReceived('info')
+            ->once()
+            ->with("Создан напиток #{$drink->id}: {$drink->title}");
+    }
+
+    public function test_observer_logs_changes_to_an_updated_drink(): void
+    {
+        $drink = Drink::factory()->create(['title' => 'lr10-test before update']);
+        Log::spy();
+
+        $drink->update(['title' => 'lr10-test after update']);
+
+        Log::shouldHaveReceived('info')
+            ->withArgs(fn (string $message, array $changes): bool => $message === "Изменён напиток #{$drink->id}"
+                && ($changes['title'] ?? null) === 'lr10-test after update')
+            ->once();
+    }
+
     public function test_deleting_a_drink_removes_its_public_image_and_private_attachment(): void
     {
         $editor = User::factory()->create(['role' => 'editor']);
@@ -116,6 +141,7 @@ class DrinkFilesTest extends TestCase
             'image' => 'drinks/to-delete.jpg',
             'attachment' => 'attachments/to-delete.pdf',
         ]);
+        Log::spy();
 
         $this->actingAs($editor)
             ->delete(route('admin.drinks.destroy', $drink))
@@ -124,6 +150,30 @@ class DrinkFilesTest extends TestCase
         $this->assertDatabaseMissing('drinks', ['id' => $drink->id]);
         Storage::disk('public')->assertMissing('drinks/to-delete.jpg');
         Storage::disk('local')->assertMissing('attachments/to-delete.pdf');
+        Log::shouldHaveReceived('info')
+            ->withArgs(fn (string $message, array $context): bool => $message === 'Напиток удалён'
+                && $context === [
+                    'drink_id' => $drink->id,
+                    'title' => $drink->title,
+                ])
+            ->once();
+    }
+
+    public function test_bulk_delete_does_not_trigger_the_drink_observer(): void
+    {
+        $category = Category::factory()->create();
+        Storage::disk('public')->put('drinks/lr10-test.jpg', 'image');
+        Storage::disk('local')->put('attachments/lr10-test.pdf', '%PDF-test');
+        $drink = Drink::factory()->for($category)->create([
+            'image' => 'drinks/lr10-test.jpg',
+            'attachment' => 'attachments/lr10-test.pdf',
+        ]);
+
+        Drink::query()->whereKey($drink->id)->delete();
+
+        $this->assertDatabaseMissing('drinks', ['id' => $drink->id]);
+        Storage::disk('public')->assertExists('drinks/lr10-test.jpg');
+        Storage::disk('local')->assertExists('attachments/lr10-test.pdf');
     }
 
     public function test_replacing_a_private_attachment_deletes_the_previous_file(): void

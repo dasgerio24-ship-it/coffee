@@ -111,12 +111,6 @@ class DrinkController extends Controller
     {
         Gate::authorize('delete', $drink);
 
-        if ($drink->image) {
-            Storage::disk('public')->delete($drink->image);
-        }
-        if ($drink->attachment) {
-            Storage::disk('local')->delete($drink->attachment);
-        }
         $drink->delete();
 
         return back()->with('success', 'Напиток удалён');

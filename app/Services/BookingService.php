@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Contracts\SmsSender;
+use App\Jobs\RemindAboutBooking;
 use App\Models\Booking;
 use App\Models\Drink;
 use App\Models\User;
@@ -11,8 +11,6 @@ use Illuminate\Validation\ValidationException;
 
 class BookingService
 {
-    public function __construct(private readonly SmsSender $sms) {}
-
     /**
      * @param  array{phone: string, comment?: string|null}  $data
      */
@@ -53,7 +51,7 @@ class BookingService
             ]);
         });
 
-        $this->sms->send($data['phone'], "Заказ №{$booking->id} принят: {$drink->title}");
+        RemindAboutBooking::dispatch($booking)->delay(now()->addMinutes(2));
 
         return $booking;
     }
